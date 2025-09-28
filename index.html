@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataDeck AI - From Data to Deck in Minutes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'background-primary': '#0D0F18',
+              'panel-primary': 'rgba(20, 22, 36, 0.6)',
+              'panel-inset': 'rgba(0, 0, 0, 0.2)',
+              'text-primary': '#E1E1E6',
+              'text-secondary': '#A0A3BD',
+              'border-primary': 'rgba(173, 150, 255, 0.1)',
+              'primary-accent': '#8A63F5',
+              'primary-accent-gradient-from': '#8A63F5',
+              'primary-accent-gradient-to': '#638BF5',
+            },
+            boxShadow: {
+              'glow': '0 0 20px 0 rgba(138, 99, 245, 0.6)',
+              'glow-sm': '0 0 8px 0 rgba(138, 99, 245, 0.4)',
+              'inner-glow': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.05)',
+            },
+            animation: {
+                'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                'modal-in': 'modalIn 0.3s ease-out forwards',
+                'scanning': 'scanning 3s ease-in-out infinite',
+                'checkmark-appear': 'checkmarkAppear 0.5s ease-out forwards',
+                'progress-fill': 'progressFill 3s ease-out forwards',
+                'workflow-step-in': 'workflowStepIn 0.6s ease-out forwards',
+                'workflow-pulse': 'workflowPulse 1s ease-in-out infinite',
+                'mouse-click': 'mouseClick 0.8s ease-in-out infinite',
+                'click-ripple': 'clickRipple 1.2s ease-out forwards',
+                'message-appear': 'messageAppear 0.5s ease-out forwards',
+                'slide-edit': 'slideEdit 2s ease-in-out infinite',
+            },
+            keyframes: {
+                fadeInUp: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                modalIn: {
+                    '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                },
+                scanning: {
+                    '0%': { transform: 'translateY(0)', opacity: '0' },
+                    '10%': { opacity: '1' },
+                    '90%': { opacity: '1' },
+                    '100%': { transform: 'translateY(100%)', opacity: '0' },
+                },
+                checkmarkAppear: {
+                    '0%': { opacity: '0', transform: 'scale(0.5)' },
+                    '50%': { transform: 'scale(1.2)' },
+                    '100%': { opacity: '1', transform: 'scale(1)' },
+                },
+                progressFill: {
+                    '0%': { width: '0%' },
+                    '100%': { width: '100%' },
+                },
+                workflowStepIn: {
+                    '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                    '100%': { opacity: '1', transform: 'translateX(0)' },
+                },
+                workflowPulse: {
+                    '0%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.05)' },
+                    '100%': { transform: 'scale(1)' },
+                },
+                mouseClick: {
+                    '0%': { transform: 'translate(-50%, -50%) scale(1)', opacity: '0' },
+                    '20%': { opacity: '1' },
+                    '40%': { transform: 'translate(-50%, -50%) scale(1.3)', opacity: '1' },
+                    '60%': { transform: 'translate(-50%, -50%) scale(0.8)', opacity: '1' },
+                    '80%': { transform: 'translate(-50%, -50%) scale(1.1)', opacity: '1' },
+                    '100%': { transform: 'translate(-50%, -50%) scale(1)', opacity: '0' },
+                },
+                clickRipple: {
+                    '0%': { 
+                        opacity: '0', 
+                        transform: 'scale(0.8)' 
+                    },
+                    '20%': { 
+                        opacity: '1', 
+                        transform: 'scale(1)' 
+                    },
+                    '100%': { 
+                        opacity: '0', 
+                        transform: 'scale(1.5)' 
+                    },
+                },
+                messageAppear: {
+                    '0%': { opacity: '0', transform: 'translateY(10px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)' },
+                },
+                slideEdit: {
+                    '0%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.02)' },
+                    '100%': { transform: 'scale(1)' },
+                }
+            },
+          }
+        }
+      }
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: var(--background-primary);
+        color: var(--text-primary);
+        overflow-x: hidden;
+      }
+
+      :root {
+        --gradient-primary-solid: linear-gradient(135deg, #8A63F5 0%, #638BF5 100%);
+        --gradient-primary-hover: linear-gradient(135deg, #9C74FF 0%, #729BFF 100%);
+        --gradient-primary-soft: linear-gradient(135deg, rgba(138, 99, 245, 0.5) 0%, rgba(99, 139, 245, 0.45) 100%);
+        --gradient-primary-faint: linear-gradient(135deg, rgba(138, 99, 245, 0.28) 0%, rgba(99, 139, 245, 0.24) 100%);
+      }
+
+      .gradient-primary {
+        background-image: var(--gradient-primary-solid);
+        background-size: 200% 200%;
+        transition: background-position 0.6s ease, box-shadow 0.3s ease, transform 0.3s ease;
+      }
+
+      .gradient-primary:hover,
+      .gradient-primary:focus-visible {
+        background-image: var(--gradient-primary-hover);
+        background-position: 100% 0;
+      }
+
+      .gradient-primary:focus-visible {
+        outline: 2px solid rgba(138, 99, 245, 0.35);
+        outline-offset: 2px;
+      }
+
+      .gradient-text {
+        background-image: var(--gradient-primary-solid);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .animated-background {
+        background-image:
+          radial-gradient(circle, rgba(255,255,255,0.6) 0.5px, transparent 1px),
+          radial-gradient(circle, rgba(255,255,255,0.4) 0.5px, transparent 1px),
+          radial-gradient(at 20% 20%, hsla(250,50%,20%,0.25) 0px, transparent 50%),
+          radial-gradient(at 80% 20%, hsla(280,50%,25%,0.15) 0px, transparent 50%),
+          radial-gradient(at 20% 80%, hsla(260,50%,20%,0.25) 0px, transparent 50%),
+          radial-gradient(at 80% 80%, hsla(240,50%,25%,0.15) 0px, transparent 50%);
+        background-size: 250px 250px, 350px 350px, auto, auto, auto, auto;
+        background-position: 0 0, 130px 270px, 0 0, 0 0, 0 0, 0 0;
+        animation: move-background 120s linear infinite;
+      }
+      
+      @keyframes move-background {
+        0% { background-position: 0 0, 130px 270px, 0 0, 0 0, 0 0, 0 0; }
+        100% { background-position: 500px 500px, 630px 770px, 0 0, 0 0, 0 0, 0 0; }
+      }
+
+      .glass-pane {
+        background: var(--panel-primary);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--border-primary);
+        border-radius: 0.75rem; /* 12px */
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      }
+
+      .fade-in-section {
+        opacity: 0;
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        transform: translateY(20px);
+      }
+
+      .fade-in-section.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      .gradient-blur {
+        position: absolute;
+        filter: blur(80px);
+        opacity: 0.3;
+        z-index: -1;
+      }
+
+      .gradient-blob {
+        position: absolute;
+        filter: blur(120px);
+        border-radius: 50%;
+        opacity: 0.6;
+        background-image: var(--gradient-primary-soft);
+      }
+
+      .gradient-blob.faint {
+        background-image: var(--gradient-primary-faint);
+        opacity: 0.35;
+      }
+
+      .tab-button[aria-selected="true"] {
+        background-color: var(--primary-accent);
+        color: white;
+        box-shadow: var(--glow);
+      }
+
+      .scrollbar-hide {
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+        scrollbar-width: none;  /* Firefox */
+      }
+      .scrollbar-hide::-webkit-scrollbar { 
+        display: none;  /* Safari and Chrome */
+      }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-background-primary/50 backdrop-blur-md border-b border-border-primary">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold tracking-wider">
+                DataDeck AI
+            </div>
+            <button class="join-waitlist-btn gradient-primary text-white px-5 py-2.5 rounded-md text-sm font-semibold transition-transform duration-300 shadow-glow hover:shadow-lg hover:-translate-y-0.5">
+                Join Waitlist
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero-section" class="relative min-h-screen flex items-center justify-center text-center overflow-hidden pt-32 pb-16">
+            <div class="animated-background absolute inset-0 z-0"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background-primary/90 z-10"></div>
+            
+            <div class="relative z-20 px-4">
+                <div class="animate-fade-in-up" style="animation-delay: 200ms;">
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tighter mb-6 leading-tight">
+                        Go from Raw Data to<br /> <span class="gradient-text">Boardroom-Ready Deck</span>
+                    </h1>
+                    <p class="max-w-3xl mx-auto text-lg md:text-xl text-text-secondary mb-10">
+                        Stop wrestling with code. Upload your data, guide our AI Analyst, and receive validated reports and presentation-ready slides in minutes.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                         <button class="join-waitlist-btn gradient-primary text-white px-8 py-4 rounded-md font-semibold transition-transform duration-300 shadow-glow hover:shadow-lg hover:-translate-y-0.5">
+                            Request Your Invite
+                        </button>
+                    </div>
+                </div>
+
+                <!-- App Mockup -->
+                <div id="hero-mockup-container" class="relative max-w-6xl mx-auto mt-20 animate-fade-in-up" style="animation-delay: 400ms;">
+                    <div class="gradient-blob faint absolute -top-1/4 -left-1/4 w-1/2 h-1/2"></div>
+                    <div class="gradient-blob absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2"></div>
+                    <div class="relative glass-pane p-6 shadow-2xl">
+                        <div class="bg-background-primary rounded-md relative overflow-hidden">
+                            <!-- Dark Mode Mockup -->
+                            <img src="hero_dark.png" alt="Dark mode of the application UI" class="w-full h-auto object-contain transition-opacity duration-700 ease-in-out opacity-100 dark-mockup">
+                            <!-- Light Mode Mockup -->
+                            <img src="hero_light.png" alt="Light mode of the application UI" class="w-full h-auto object-contain transition-opacity duration-700 ease-in-out opacity-0 light-mockup absolute top-0 left-0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Feature Showcase -->
+        <section class="py-20 lg:py-32 overflow-hidden">
+            <div class="container mx-auto px-6 space-y-24">
+                <div class="text-center max-w-3xl mx-auto fade-in-section">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4 tracking-tighter">A Smarter Workflow, Not Just a Smarter Chatbot.</h2>
+                    <p class="text-text-secondary text-lg">DataDeck AI is built around a core belief: true insight comes from a partnership between human expertise and AI efficiency. Here's how we make it happen.</p>
+                </div>
+
+                <!-- Feature 1: Auto-Validate -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-section">
+                    <div class="pr-0 lg:pr-12">
+                        <span class="text-primary-accent font-semibold tracking-wider">AUTO-VALIDATE ENGINE</span>
+                        <h3 class="text-3xl md:text-4xl font-bold my-4 tracking-tight">Analysis You Can Actually Trust.</h3>
+                        <p class="text-text-secondary text-lg mb-6">Our AI doesn't just generate charts; it validates them. It cross-references data, checks for logical errors, and ensures every visualization tells an accurate story. Stop second-guessing your results and present with confidence.</p>
+                    </div>
+                    <div class="relative">
+                        <div class="gradient-blob absolute -top-1/4 -left-1/4 w-3/4 h-3/4"></div>
+                        <div class="glass-pane p-4 shadow-lg h-full">
+                            <div class="bg-background-primary rounded h-full min-h-[300px] flex items-center justify-center p-6 relative overflow-hidden">
+                                <!-- Auto-Validate Visual -->
+                                <div class="auto-validate-container w-full h-full relative">
+                                    <!-- Sample Chart -->
+                                    <div class="chart-container relative w-full h-48 bg-panel-inset rounded-lg p-4 mb-4">
+                                        <div class="chart-title text-sm font-semibold text-text-primary mb-3">Sales Performance 2023-2024</div>
+                                        <div class="chart-area relative h-32">
+                                            <!-- Bar Chart -->
+                                            <div class="flex items-end justify-between h-full gap-1">
+                                                <div class="bar bg-primary-accent h-16 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-20 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-12 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-24 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-28 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-28 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-14 w-8 rounded-t"></div>
+                                                <div class="bar bg-primary-accent h-12 w-8 rounded-t"></div>
+                                            </div>
+                                            <!-- X-axis labels -->
+                                            <div class="flex justify-between text-xs text-text-secondary mt-2">
+                                                <span>Q1 23</span>
+                                                <span>Q2 23</span>
+                                                <span>Q3 23</span>
+                                                <span>Q4 23</span>
+                                                <span>Q1 24</span>
+                                                <span>Q2 24</span>
+                                                <span>Q3 24</span>
+                                                <span>Q4 24</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Scanning Line -->
+                                        <div class="scanning-line absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary-accent to-transparent opacity-0"></div>
+                                        
+                                        <!-- Validation Checkmarks -->
+                                        <div class="validation-checkmarks absolute inset-0 pointer-events-none">
+                                            <div class="checkmark checkmark-1 absolute top-2 right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="checkmark checkmark-2 absolute bottom-2 left-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                            <div class="checkmark checkmark-3 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Validation Status -->
+                                    <div class="validation-status text-center">
+                                        <div class="status-text text-sm text-text-secondary mb-2">Validating chart accuracy...</div>
+                                        <div class="progress-bar w-full h-1 bg-panel-inset rounded-full overflow-hidden">
+                                            <div class="progress-fill h-full bg-gradient-to-r from-primary-accent to-green-500 rounded-full w-0"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2: One-Click -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-section">
+                     <div class="relative lg:order-last">
+                         <div class="gradient-blob faint absolute -bottom-1/4 -right-1/4 w-3/4 h-3/4"></div>
+                         <div class="glass-pane p-4 shadow-lg h-full">
+                             <div class="bg-background-primary rounded h-full min-h-[300px] flex items-center justify-center p-6 relative overflow-hidden">
+                                 <!-- One-Click Workflow Visual -->
+                                 <div class="one-click-container w-full h-full relative">
+                                     <!-- Main Workflow Area -->
+                                     <div class="workflow-main flex flex-col h-full">
+                                         <!-- Workflow Steps - Horizontal -->
+                                         <div class="workflow-steps flex justify-between items-center mb-6 h-20">
+                                             <!-- Step 1: Data Upload -->
+                                             <div class="workflow-step step-1 flex flex-col items-center space-y-2 opacity-0" style="opacity: 0; transform: translateY(-20px);">
+                                                 <div class="upload-icon w-12 h-12 bg-primary-accent rounded-full flex items-center justify-center relative">
+                                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                                     </svg>
+                                                     <div class="check-icon absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                         <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                         </svg>
+                                                     </div>
+                                                 </div>
+                                                 <div class="text-center">
+                                                     <div class="text-xs font-semibold text-text-primary">Upload</div>
+                                                     <div class="text-xs text-text-secondary">Data</div>
+                                                 </div>
+                                             </div>
+
+                                             <!-- Arrow -->
+                                             <div class="arrow w-8 h-0.5 bg-text-secondary opacity-30"></div>
+
+                                             <!-- Step 2: AI Suggestions -->
+                                             <div class="workflow-step step-2 flex flex-col items-center space-y-2 opacity-0" style="opacity: 0; transform: translateY(-20px);">
+                                                 <div class="ai-icon w-12 h-12 bg-primary-accent rounded-full flex items-center justify-center relative">
+                                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                     </svg>
+                                                     <!-- Click Highlight -->
+                                                     <div class="click-highlight absolute inset-0 rounded-full bg-white/20 opacity-0"></div>
+                                                     <div class="loading-spinner absolute inset-0 border-2 border-primary-accent border-t-transparent rounded-full animate-spin opacity-0"></div>
+                                                     <div class="check-icon absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                         <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                         </svg>
+                                                     </div>
+                                                     <!-- Mouse Pointer -->
+                                                     <div class="mouse-pointer absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 opacity-0 z-10">
+                                                         <svg class="w-10 h-10 text-black drop-shadow-lg" fill="currentColor" viewBox="0 0 24 24">
+                                                             <path d="M7.5 2.5L7.5 15.5L12.5 10.5L15.5 10.5L7.5 2.5Z" stroke="currentColor" stroke-width="1" fill="currentColor"/>
+                                                         </svg>
+                                                     </div>
+                                                     <!-- Click Ripple Effect -->
+                                                     <div class="click-ripple absolute inset-0 rounded-full opacity-0">
+                                                         <div class="ripple-circle absolute inset-0 rounded-full border-2 border-white/60"></div>
+                                                         <div class="ripple-circle absolute inset-0 rounded-full border-2 border-white/40"></div>
+                                                         <div class="ripple-circle absolute inset-0 rounded-full border-2 border-white/20"></div>
+                                                     </div>
+                                                 </div>
+                                                 <div class="text-center">
+                                                     <div class="text-xs font-semibold text-text-primary">AI</div>
+                                                     <div class="text-xs text-text-secondary">Suggestions</div>
+                                                 </div>
+                                             </div>
+
+                                             <!-- Arrow -->
+                                             <div class="arrow w-8 h-0.5 bg-text-secondary opacity-30"></div>
+
+                                             <!-- Step 3: Report Generation -->
+                                             <div class="workflow-step step-3 flex flex-col items-center space-y-2 opacity-0" style="opacity: 0; transform: translateY(-20px);">
+                                                 <div class="report-icon w-12 h-12 bg-primary-accent rounded-full flex items-center justify-center relative">
+                                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                         <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z" clip-rule="evenodd"></path>
+                                                     </svg>
+                                                     <div class="check-icon absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                         <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                         </svg>
+                                                     </div>
+                                                 </div>
+                                                 <div class="text-center">
+                                                     <div class="text-xs font-semibold text-text-primary">Report</div>
+                                                     <div class="text-xs text-text-secondary">Generated</div>
+                                                 </div>
+                                             </div>
+
+                                             <!-- Arrow -->
+                                             <div class="arrow w-8 h-0.5 bg-text-secondary opacity-30"></div>
+
+                                             <!-- Step 4: Slide Creation -->
+                                             <div class="workflow-step step-4 flex flex-col items-center space-y-2 opacity-0" style="opacity: 0; transform: translateY(-20px);">
+                                                 <div class="slides-icon w-12 h-12 bg-primary-accent rounded-full flex items-center justify-center relative">
+                                                     <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                                                     </svg>
+                                                     <div class="check-icon absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center opacity-0">
+                                                         <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                         </svg>
+                                                     </div>
+                                                 </div>
+                                                 <div class="text-center">
+                                                     <div class="text-xs font-semibold text-text-primary">Slides</div>
+                                                     <div class="text-xs text-text-secondary">Created</div>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                         <!-- Progress Indicator -->
+                                         <div class="progress-indicator mb-4">
+                                             <div class="flex items-center justify-between text-xs text-text-secondary mb-2">
+                                                 <span>Workflow Progress</span>
+                                                 <span class="progress-percentage">0%</span>
+                                             </div>
+                                             <div class="w-full h-2 bg-panel-inset rounded-full overflow-hidden">
+                                                 <div class="progress-bar h-full bg-gradient-to-r from-primary-accent to-green-500 rounded-full w-0"></div>
+                                             </div>
+                                         </div>
+
+                                         <!-- Final Result Preview -->
+                                         <div class="result-preview p-3 bg-panel-inset rounded-lg opacity-0 flex-1" style="opacity: 0;">
+                                             <div class="text-xs font-semibold text-text-primary mb-2">Generated Output:</div>
+                                             <div class="flex space-x-2">
+                                                 <div class="w-12 h-8 bg-primary-accent/20 rounded flex items-center justify-center text-xs text-text-secondary">Report</div>
+                                                 <div class="w-12 h-8 bg-primary-accent/20 rounded flex items-center justify-center text-xs text-text-secondary">Slide 1</div>
+                                                 <div class="w-12 h-8 bg-primary-accent/20 rounded flex items-center justify-center text-xs text-text-secondary">Slide 2</div>
+                                                 <div class="w-12 h-8 bg-primary-accent/20 rounded flex items-center justify-center text-xs text-text-secondary">Slide 3</div>
+                                                 <div class="w-12 h-8 bg-primary-accent/20 rounded flex items-center justify-center text-xs text-text-secondary">+</div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="pl-0 lg:pl-12 lg:order-first">
+                        <span class="text-primary-accent font-semibold tracking-wider">ONE-CLICK DECKS</span>
+                        <h3 class="text-3xl md:text-4xl font-bold my-4 tracking-tight">From Complex Report to Polished Deck.</h3>
+                        <p class="text-text-secondary text-lg mb-6">Transform raw data into a narrative report complete with written analysis. Then, convert the entire report into a polished, editable presentation with a single click. Ready for your board meeting in minutes, not days.</p>
+                    </div>
+                </div>
+
+                 <!-- Feature 3: Co-pilot -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center fade-in-section">
+                    <div class="pr-0 lg:pr-12">
+                        <span class="text-primary-accent font-semibold tracking-wider">ANALYST CO-PILOT</span>
+                        <h3 class="text-3xl md:text-4xl font-bold my-4 tracking-tight">Your Strategy, AI-Powered.</h3>
+                        <p class="text-text-secondary text-lg mb-6">While our AI can work autonomously, you're always in control. Easily steer the analysis, request specific deep-dives, or edit any part of the generated report or slides. It's the perfect partnership of human intuition and AI speed.</p>
+                    </div>
+                    <div class="relative">
+                        <div class="gradient-blob absolute -top-1/4 -right-1/4 w-3/4 h-3/4"></div>
+                        <div class="glass-pane p-4 shadow-lg h-full">
+                            <div class="bg-background-primary rounded h-full min-h-[300px] flex items-center justify-center p-6 relative overflow-hidden">
+                                <!-- Co-pilot Visual -->
+                                <div class="copilot-container w-full h-full relative flex flex-col">
+                                    <!-- Main Content Area -->
+                                    <div class="main-content flex-1 flex flex-col lg:flex-row mb-4 gap-3">
+                                        <!-- Presentation Slide (16:9 aspect ratio) -->
+                                        <div class="presentation-slide flex-1 bg-panel-inset rounded-lg p-3 relative">
+                                            <div class="slide-header flex items-center justify-between mb-2">
+                                                <h3 class="text-xs font-semibold text-text-primary">Slide 3 of 5</h3>
+                                                <div class="flex space-x-1">
+                        <div class="w-1.5 h-1.5 rounded-full" style="background-image: var(--gradient-primary-solid);"></div>
+                                                    <div class="w-1.5 h-1.5 bg-text-secondary rounded-full"></div>
+                                                    <div class="w-1.5 h-1.5 bg-text-secondary rounded-full"></div>
+                                                    <div class="w-1.5 h-1.5 bg-text-secondary rounded-full"></div>
+                                                    <div class="w-1.5 h-1.5 bg-text-secondary rounded-full"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- 16:9 Slide Content -->
+                                            <div class="slide-content w-full bg-white rounded relative overflow-hidden" style="aspect-ratio: 16/9;">
+                                                <!-- Slide Background -->
+                                                <div class="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100"></div>
+                                                
+                                                <!-- Slide Content -->
+                                                <div class="relative z-10 p-3 h-full flex flex-col">
+                                                    <!-- Chart Title -->
+                                                    <div class="chart-title mb-2">
+                                                        <h4 class="chart-title-text text-xs font-normal text-gray-800 mb-1 transition-all duration-500">Combined Fuel Efficiency (MPG) Distribution by Vehicle Class</h4>
+                                                    </div>
+                                                    
+                                                    <!-- Chart Area with proper positioning -->
+                                                    <div class="chart-area flex-1 bg-gray-50 rounded p-2 relative min-h-0">
+                                                        <!-- Y-axis Label -->
+                                                        <div class="absolute left-1 top-1/2 transform -translate-y-1/2 -rotate-90 text-xs text-gray-500 font-medium">
+                                                            MPG
+                                                        </div>
+                                                        
+                                                        <!-- Chart Bars Container -->
+                                                        <div class="ml-6 h-full flex flex-col">
+                                                            <!-- Chart Bars -->
+                                                            <div class="flex items-end justify-between flex-1 mb-1">
+                                                                <div class="bar bg-blue-500 h-12 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-16 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-8 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-20 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-14 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-16 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-10 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-22 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-15 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-17 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-18 w-2 rounded-t"></div>
+                                                                <div class="bar bg-blue-500 h-19 w-2 rounded-t"></div>
+                                                            </div>
+                                                            
+            
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Editing Indicator -->
+                                                <div class="editing-indicator absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs opacity-0">
+                                                    <div class="flex items-center space-x-1">
+                                                        <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                                        <span>Editing...</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Chat Interface -->
+                                        <div class="chat-interface w-full lg:w-80 bg-panel-inset rounded-lg p-3 flex flex-col">
+                                            <div class="chat-header flex items-center justify-between mb-3">
+                                                <h3 class="text-sm font-semibold text-text-primary">Chat</h3>
+                                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                            </div>
+                                            
+                                            <!-- Chat Messages -->
+                                            <div class="chat-messages flex-1 space-y-2 mb-3 overflow-y-auto max-h-32 lg:max-h-none scrollbar-hide">
+                                                <!-- AI Message -->
+                                                <div class="ai-message flex items-start space-x-2 opacity-0" style="opacity: 0; transform: translateY(10px);">
+                                                    <div class="w-5 h-5 gradient-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="bg-panel-primary rounded-lg p-2 max-w-xs">
+                                                        <p class="text-xs text-text-primary">I've updated the chart title. Would you like me to adjust the color scheme as well?</p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- User Message -->
+                                                <div class="user-message flex items-start space-x-2 justify-end opacity-0" style="opacity: 0; transform: translateY(10px);">
+                                                    <div class="gradient-primary rounded-lg p-2 max-w-xs">
+                                                        <p class="text-xs text-white">Make the title more prominent</p>
+                                                    </div>
+                                                    <div class="w-5 h-5 bg-text-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- AI Response -->
+                                                <div class="ai-message flex items-start space-x-2 opacity-0" style="opacity: 0; transform: translateY(10px);">
+                                                    <div class="w-5 h-5 gradient-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="bg-panel-primary rounded-lg p-2 max-w-xs">
+                                                        <p class="text-xs text-text-primary">Perfect! I've made the title larger and bolder. The chart now has better visual hierarchy.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Chat Input -->
+                                            <div class="chat-input flex items-center space-x-2">
+                                                <input type="text" placeholder="Ask about your data..." class="flex-1 bg-panel-primary text-text-primary placeholder:text-text-secondary border border-border-primary rounded-md px-2 py-1.5 text-xs focus:ring-2 focus:ring-primary-accent focus:outline-none">
+                                                <button class="gradient-primary text-white p-1.5 rounded-md transition-transform duration-300 hover:shadow-glow hover:-translate-y-0.5 focus-visible:-translate-y-1">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Section -->
+        <section class="py-20 lg:py-32 fade-in-section overflow-hidden relative">
+            <!-- Gradient Background -->
+            <div class="gradient-blob faint absolute -top-1/6 -left-1/6 w-1/4 h-1/4 opacity-30"></div>
+            <div class="gradient-blob absolute -bottom-1/6 -right-1/6 w-1/2 h-1/2 opacity-40"></div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4 tracking-tighter">See DataDeck AI in Action</h2>
+                    <p class="text-text-secondary text-lg">Watch how our AI transforms raw data into boardroom-ready presentations in real-time.</p>
+                </div>
+                
+                <div class="max-w-6xl mx-auto">
+                    <div class="relative glass-pane p-8 shadow-2xl">
+                        <!-- Video Container -->
+                        <div class="relative bg-background-primary rounded-lg overflow-hidden">
+                            <iframe 
+                                class="w-full h-auto rounded-lg shadow-lg" 
+                                src="https://www.youtube.com/embed/iQPiFJHoTWM?rel=0&modestbranding=1&showinfo=0"
+                                title="DataDeck AI Demo Video"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                                style="aspect-ratio: 16/9; width: 100%; height: auto;"
+                            >
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="py-20 lg:py-32 fade-in-section">
+            <div class="container mx-auto px-6 text-center">
+                 <div class="relative glass-pane max-w-4xl mx-auto py-16 px-8 overflow-hidden">
+                    <div class="gradient-blob absolute -top-1/2 -left-1/2 w-full h-full opacity-50"></div>
+                    <div class="relative">
+                        <h2 class="text-3xl md:text-5xl font-bold leading-tight tracking-tighter">Ready to Revolutionize Your Data Workflow?</h2>
+                        <p class="text-lg text-text-secondary mt-6 max-w-xl mx-auto">Join the waitlist and be the first to experience the future of data analysis.</p>
+                        <button class="join-waitlist-btn inline-block mt-10 gradient-primary text-white px-8 py-4 rounded-md font-semibold transition-transform duration-300 shadow-glow hover:shadow-lg hover:-translate-y-0.5 focus-visible:-translate-y-1">
+                            Request Your Invite
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Waitlist Modal -->
+    <div id="waitlist-modal" class="fixed inset-0 z-[100] items-center justify-center bg-background-primary/80 backdrop-blur-md hidden">
+        <div class="glass-pane w-full max-w-md m-4 p-8 rounded-lg animate-modal-in text-center relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors">&times;</button>
+            <h2 class="text-text-primary text-2xl font-bold mb-4">Join the Waitlist</h2>
+            <p class="text-text-secondary mb-6">Get notified when we launch and be among the first to get access.</p>
+            <form class="flex flex-col gap-4" onsubmit="event.preventDefault(); this.innerHTML = '<p class=\'text-lg text-primary-accent\'>Thank you for joining!</p>';">
+                <input type="email" placeholder="your.email@company.com" required class="bg-panel-inset text-text-primary placeholder:text-text-secondary border border-border-primary rounded-md p-3 focus:ring-2 focus:ring-primary-accent focus:outline-none transition-all">
+                <button type="submit" class="gradient-primary text-white px-8 py-3 rounded-md font-semibold transition-transform duration-300 shadow-glow hover:shadow-lg hover:-translate-y-0.5">
+                    Request Invite
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="border-t border-border-primary">
+        <div class="container mx-auto px-6 py-8 text-center text-text-secondary">
+            <p>&copy; 2024 DataDeck AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fade-in sections on scroll
+            const sections = document.querySelectorAll('.fade-in-section');
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        sectionObserver.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '0px', threshold: 0.1 });
+            sections.forEach(section => sectionObserver.observe(section));
+
+            // Hero mockup theme switch on scroll
+            const heroSection = document.getElementById('hero-section');
+            const mockupContainer = document.getElementById('hero-mockup-container');
+            const darkMockup = mockupContainer.querySelector('.dark-mockup');
+            const lightMockup = mockupContainer.querySelector('.light-mockup');
+
+            // Track scroll position to switch themes
+            let isScrolled = false;
+            
+            const handleScroll = () => {
+                const scrollY = window.scrollY;
+                const heroHeight = heroSection.offsetHeight;
+                
+                // Switch to light mode when scrolled past 30% of hero section
+                const shouldShowLight = scrollY > heroHeight * 0.3;
+                
+                if (shouldShowLight && !isScrolled) {
+                    lightMockup.style.opacity = '1';
+                    darkMockup.style.opacity = '0';
+                    isScrolled = true;
+                } else if (!shouldShowLight && isScrolled) {
+                    lightMockup.style.opacity = '0';
+                    darkMockup.style.opacity = '1';
+                    isScrolled = false;
+                }
+            };
+
+            window.addEventListener('scroll', handleScroll);
+            
+            // Initial check
+            handleScroll();
+
+            // Auto-Validate Animation
+            const autoValidateContainer = document.querySelector('.auto-validate-container');
+            if (autoValidateContainer) {
+                const scanningLine = autoValidateContainer.querySelector('.scanning-line');
+                const checkmarks = autoValidateContainer.querySelectorAll('.checkmark');
+                const progressFill = autoValidateContainer.querySelector('.progress-fill');
+                const statusText = autoValidateContainer.querySelector('.status-text');
+                
+                let animationCycle = 0;
+                
+                const startValidationAnimation = () => {
+                    // Reset elements
+                    scanningLine.style.opacity = '0';
+                    checkmarks.forEach(checkmark => {
+                        checkmark.style.opacity = '0';
+                        checkmark.style.transform = 'scale(0.5)';
+                    });
+                    progressFill.style.width = '0%';
+                    statusText.textContent = 'Validating chart accuracy...';
+                    
+                    // Start scanning
+                    setTimeout(() => {
+                        scanningLine.style.animation = 'scanning 3s ease-in-out';
+                        progressFill.style.animation = 'progressFill 3s ease-out';
+                    }, 500);
+                    
+                    // Show checkmarks with delays
+                    setTimeout(() => {
+                        checkmarks[0].style.animation = 'checkmarkAppear 0.5s ease-out forwards';
+                    }, 1000);
+                    
+                    setTimeout(() => {
+                        checkmarks[1].style.animation = 'checkmarkAppear 0.5s ease-out forwards';
+                    }, 1500);
+                    
+                    setTimeout(() => {
+                        checkmarks[2].style.animation = 'checkmarkAppear 0.5s ease-out forwards';
+                        statusText.textContent = 'Validation complete ✓';
+                    }, 2000);
+                    
+                    // Reset after completion
+                    setTimeout(() => {
+                        scanningLine.style.animation = 'none';
+                        progressFill.style.animation = 'none';
+                        setTimeout(() => {
+                            startValidationAnimation();
+                        }, 2000);
+                    }, 4000);
+                };
+                
+                // Start animation when section is visible
+                const autoValidateObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startValidationAnimation();
+                            autoValidateObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                autoValidateObserver.observe(autoValidateContainer);
+            }
+
+            // One-Click Workflow Animation
+            const oneClickContainer = document.querySelector('.one-click-container');
+            if (oneClickContainer) {
+                const workflowSteps = oneClickContainer.querySelectorAll('.workflow-step');
+                const progressBar = oneClickContainer.querySelector('.progress-bar');
+                const progressPercentage = oneClickContainer.querySelector('.progress-percentage');
+                const resultPreview = oneClickContainer.querySelector('.result-preview');
+                
+                const startWorkflowAnimation = () => {
+                    // Reset all elements
+                    workflowSteps.forEach(step => {
+                        step.style.opacity = '0';
+                        step.style.transform = 'translateY(-20px)';
+                        // Reset all checkmarks and effects
+                        const checkIcon = step.querySelector('.check-icon');
+                        if (checkIcon) {
+                            checkIcon.style.opacity = '0';
+                            checkIcon.style.transform = 'scale(0.5)';
+                        }
+                        const mousePointer = step.querySelector('.mouse-pointer');
+                        if (mousePointer) {
+                            mousePointer.style.opacity = '0';
+                            mousePointer.style.animation = 'none';
+                        }
+                        const clickRipple = step.querySelector('.click-ripple');
+                        if (clickRipple) {
+                            clickRipple.style.opacity = '0';
+                            clickRipple.style.animation = 'none';
+                        }
+                        const clickHighlight = step.querySelector('.click-highlight');
+                        if (clickHighlight) {
+                            clickHighlight.style.opacity = '0';
+                        }
+                        const spinner = step.querySelector('.loading-spinner');
+                        if (spinner) {
+                            spinner.style.opacity = '0';
+                            spinner.style.animation = 'none';
+                        }
+                    });
+                    progressBar.style.width = '0%';
+                    progressPercentage.textContent = '0%';
+                    resultPreview.style.opacity = '0';
+                    
+                    // Animate steps sequentially with proper timing
+                    const stepDelays = [800, 2000, 4000, 6000]; // More spaced out timing
+                    const progressValues = [25, 50, 75, 100];
+                    
+                    workflowSteps.forEach((step, index) => {
+                        setTimeout(() => {
+                            // Show step with smooth transition
+                            step.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                            step.style.opacity = '1';
+                            step.style.transform = 'translateY(0)';
+                            
+                            // Update progress
+                            progressBar.style.transition = 'width 0.5s ease-out';
+                            progressBar.style.width = `${progressValues[index]}%`;
+                            progressPercentage.textContent = `${progressValues[index]}%`;
+                            
+                            // Handle specific step animations
+                            if (index === 0) {
+                                // Upload step - show checkmark after a brief delay
+                                setTimeout(() => {
+                                    const checkIcon = step.querySelector('.check-icon');
+                                    checkIcon.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                                    checkIcon.style.opacity = '1';
+                                    checkIcon.style.transform = 'scale(1)';
+                                }, 800);
+                            } else if (index === 1) {
+                                // AI Suggestions step - show mouse click animation
+                                setTimeout(() => {
+                                    const mousePointer = step.querySelector('.mouse-pointer');
+                                    const clickRipple = step.querySelector('.click-ripple');
+                                    const clickHighlight = step.querySelector('.click-highlight');
+                                    
+                                    mousePointer.style.opacity = '1';
+                                    mousePointer.style.animation = 'mouseClick 0.8s ease-in-out infinite';
+                                    
+                                    // Trigger ripple effect and highlight on click
+                                    setTimeout(() => {
+                                        clickRipple.style.opacity = '1';
+                                        clickRipple.style.animation = 'clickRipple 1.2s ease-out forwards';
+                                        
+                                        clickHighlight.style.transition = 'opacity 0.2s ease-out';
+                                        clickHighlight.style.opacity = '1';
+                                        
+                                        // Reset effects
+                                        setTimeout(() => {
+                                            clickRipple.style.opacity = '0';
+                                            clickRipple.style.animation = 'none';
+                                            clickHighlight.style.opacity = '0';
+                                        }, 1200);
+                                    }, 400);
+                                }, 500);
+                                
+                                // Show spinner after click animation
+                                setTimeout(() => {
+                                    const spinner = step.querySelector('.loading-spinner');
+                                    spinner.style.opacity = '1';
+                                    spinner.style.animation = 'workflow-pulse 1s ease-in-out infinite';
+                                }, 1400);
+                                
+                                // Hide spinner and show checkmark after analysis
+                                setTimeout(() => {
+                                    const spinner = step.querySelector('.loading-spinner');
+                                    const mousePointer = step.querySelector('.mouse-pointer');
+                                    const clickRipple = step.querySelector('.click-ripple');
+                                    spinner.style.opacity = '0';
+                                    mousePointer.style.opacity = '0';
+                                    clickRipple.style.opacity = '0';
+                                    const checkIcon = step.querySelector('.check-icon');
+                                    checkIcon.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                                    checkIcon.style.opacity = '1';
+                                    checkIcon.style.transform = 'scale(1)';
+                                }, 2400);
+                            } else if (index === 2) {
+                                // Report step - show checkmark after a brief delay
+                                setTimeout(() => {
+                                    const checkIcon = step.querySelector('.check-icon');
+                                    checkIcon.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                                    checkIcon.style.opacity = '1';
+                                    checkIcon.style.transform = 'scale(1)';
+                                }, 800);
+                            } else if (index === 3) {
+                                // Slides step - show checkmark and final result
+                                setTimeout(() => {
+                                    const checkIcon = step.querySelector('.check-icon');
+                                    checkIcon.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                                    checkIcon.style.opacity = '1';
+                                    checkIcon.style.transform = 'scale(1)';
+                                    
+                                    // Show result preview
+                                    setTimeout(() => {
+                                        resultPreview.style.transition = 'opacity 0.6s ease-out';
+                                        resultPreview.style.opacity = '1';
+                                    }, 500);
+                                }, 800);
+                            }
+                        }, stepDelays[index]);
+                    });
+                    
+                    // Reset and restart after completion
+                    setTimeout(() => {
+                        setTimeout(() => {
+                            startWorkflowAnimation();
+                        }, 4000);
+                    }, 10000);
+                };
+                
+                // Start animation when section is visible
+                const oneClickObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startWorkflowAnimation();
+                            oneClickObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                oneClickObserver.observe(oneClickContainer);
+                
+                // Fallback: Start animation after a short delay if intersection observer doesn't trigger
+                setTimeout(() => {
+                    if (oneClickContainer.querySelector('.workflow-step').style.opacity === '0') {
+                        startWorkflowAnimation();
+                    }
+                }, 2000);
+            }
+
+            // Co-pilot Animation
+            const copilotContainer = document.querySelector('.copilot-container');
+            if (copilotContainer) {
+                const aiMessages = copilotContainer.querySelectorAll('.ai-message');
+                const userMessages = copilotContainer.querySelectorAll('.user-message');
+                const editingIndicator = copilotContainer.querySelector('.editing-indicator');
+                const slideContent = copilotContainer.querySelector('.slide-content');
+                
+                const startCopilotAnimation = () => {
+                    // Reset all elements
+                    aiMessages.forEach(msg => {
+                        msg.style.opacity = '0';
+                        msg.style.transform = 'translateY(10px)';
+                    });
+                    userMessages.forEach(msg => {
+                        msg.style.opacity = '0';
+                        msg.style.transform = 'translateY(10px)';
+                    });
+                    editingIndicator.style.opacity = '0';
+                    slideContent.style.animation = 'none';
+                    
+                    // Animate messages sequentially - correct order
+                    const messageDelays = [500, 1500, 2500, 3500];
+                    const allMessages = [aiMessages[0], userMessages[0], aiMessages[1]];
+                    
+                    allMessages.forEach((message, index) => {
+                        setTimeout(() => {
+                            message.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                            message.style.opacity = '1';
+                            message.style.transform = 'translateY(0)';
+                            
+                            // Show editing indicator when user sends message
+                            if (message.classList.contains('user-message')) {
+                                setTimeout(() => {
+                                    editingIndicator.style.transition = 'opacity 0.3s ease-out';
+                                    editingIndicator.style.opacity = '1';
+                                    slideContent.style.animation = 'slideEdit 2s ease-in-out infinite';
+                                    
+                                    // Animate title change
+                                    const titleText = slideContent.querySelector('.chart-title-text');
+                                    if (titleText) {
+                                        titleText.style.fontWeight = 'bold';
+                                        titleText.style.fontSize = '0.875rem'; // text-sm
+                                    }
+                                }, 300);
+                            }
+                            
+                            // Hide editing indicator when AI responds
+                            if (index === allMessages.length - 1) {
+                                setTimeout(() => {
+                                    editingIndicator.style.opacity = '0';
+                                    slideContent.style.animation = 'none';
+                                    
+                                    // Reset title to original state
+                                    const titleText = slideContent.querySelector('.chart-title-text');
+                                    if (titleText) {
+                                        titleText.style.fontWeight = 'normal';
+                                        titleText.style.fontSize = '0.75rem'; // text-xs
+                                    }
+                                }, 1000);
+                            }
+                        }, messageDelays[index] || 0);
+                    });
+                    
+                    // Reset and restart after completion
+                    setTimeout(() => {
+                        setTimeout(() => {
+                            startCopilotAnimation();
+                        }, 3000);
+                    }, 6000);
+                };
+                
+                // Start animation when section is visible
+                const copilotObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startCopilotAnimation();
+                            copilotObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                copilotObserver.observe(copilotContainer);
+            }
+
+            // Waitlist Modal Logic
+            const waitlistModal = document.getElementById('waitlist-modal');
+            const waitlistBtns = document.querySelectorAll('.join-waitlist-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            
+            const openModal = () => {
+                waitlistModal.classList.remove('hidden');
+                waitlistModal.classList.add('flex');
+            }
+            const closeModal = () => {
+                waitlistModal.classList.add('hidden');
+                waitlistModal.classList.remove('flex');
+            }
+
+            waitlistBtns.forEach(btn => btn.addEventListener('click', openModal));
+            closeModalBtn.addEventListener('click', closeModal);
+            waitlistModal.addEventListener('click', (e) => {
+                if (e.target === waitlistModal) closeModal();
+            });
+
+
+            // Showcase Tabs Logic
+            const tabsContainer = document.getElementById('tabs-container');
+            const tabButtons = tabsContainer.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabsContainer.addEventListener('click', (e) => {
+                const clickedTab = e.target.closest('.tab-button');
+                if (!clickedTab) return;
+
+                const tabName = clickedTab.dataset.tab;
+
+                tabButtons.forEach(button => {
+                    button.setAttribute('aria-selected', button === clickedTab);
+                });
+
+                tabContents.forEach(content => {
+                    const isSelected = content.id === `tab-content-${tabName}`;
+                    if (isSelected) {
+                        content.classList.remove('hidden', 'opacity-0');
+                    } else {
+                        content.classList.add('hidden', 'opacity-0');
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
