@@ -704,8 +704,10 @@
             <button id="close-modal-btn" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors">&times;</button>
             <h2 class="text-text-primary text-2xl font-bold mb-4">Join the Waitlist</h2>
             <p class="text-text-secondary mb-6">Get notified when we launch and be among the first to get access.</p>
-            <form class="flex flex-col gap-4" onsubmit="event.preventDefault(); this.innerHTML = '<p class=\'text-lg text-primary-accent\'>Thank you for joining!</p>';">
-                <input type="email" placeholder="your.email@company.com" required class="bg-panel-inset text-text-primary placeholder:text-text-secondary border border-border-primary rounded-md p-3 focus:ring-2 focus:ring-primary-accent focus:outline-none transition-all">
+            <form class="flex flex-col gap-4" action="https://formsubmit.co/xraydbin@gmail.com" method="POST">
+                <input type="hidden" name="_subject" value="New waitlist signup - DataDeck AI">
+                <input type="hidden" name="_template" value="table">
+                <input type="email" name="email" placeholder="your.email@company.com" required class="bg-panel-inset text-text-primary placeholder:text-text-secondary border border-border-primary rounded-md p-3 focus:ring-2 focus:ring-primary-accent focus:outline-none transition-all">
                 <button type="submit" class="gradient-primary text-white px-8 py-3 rounded-md font-semibold transition-transform duration-300 shadow-glow hover:shadow-lg hover:-translate-y-0.5">
                     Request Invite
                 </button>
