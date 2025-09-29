@@ -704,7 +704,7 @@
             <button id="close-modal-btn" class="absolute top-4 right-4 text-text-secondary hover:text-text-primary transition-colors">&times;</button>
             <h2 class="text-text-primary text-2xl font-bold mb-4">Join the Waitlist</h2>
             <p class="text-text-secondary mb-6">Get notified when we launch and be among the first to get access.</p>
-            <form class="flex flex-col gap-4" action="https://formsubmit.co/415158b07f97ace50c955a27a12710f4" method="POST" target="_blank">
+            <form id="waitlist-form" class="flex flex-col gap-4" action="https://formsubmit.co/415158b07f97ace50c955a27a12710f4" method="POST">
                 <input type="hidden" name="_subject" value="New waitlist signup - DataDeck AI">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_captcha" value="false">
@@ -726,6 +726,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Waitlist AJAX submit to keep user on the page
+            const waitlistForm = document.getElementById('waitlist-form');
+            if (waitlistForm) {
+                waitlistForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(waitlistForm);
+                    try {
+                        await fetch(waitlistForm.action, {
+                            method: 'POST',
+                            body: formData,
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        waitlistForm.innerHTML = '<p class="text-lg text-primary-accent">Thank you! We will get back to you shortly.</p>';
+                    } catch (err) {
+                        waitlistForm.innerHTML = '<p class="text-lg text-red-400">Something went wrong. Please try again in a moment.</p>';
+                    }
+                });
+            }
             // Fade-in sections on scroll
             const sections = document.querySelectorAll('.fade-in-section');
             const sectionObserver = new IntersectionObserver((entries) => {
